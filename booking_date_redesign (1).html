@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking.com - Smart Date Selection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
+        }
+        
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: #003580;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .header {
+            background: #003580;
+            color: white;
+            padding: 16px 20px 20px;
+            flex-shrink: 0;
+        }
+        
+        .header-top {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .back-btn {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .destination-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+        
+        .destination-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .trip-details {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+        
+        .section-header {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid #e7e7e7;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        
+        .section-subtitle {
+            font-size: 14px;
+            color: #6b6b6b;
+            line-height: 1.4;
+        }
+        
+        .flexibility-options {
+            padding: 20px;
+            border-bottom: 1px solid #e7e7e7;
+        }
+        
+        .flexibility-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .flexibility-card {
+            border: 2px solid #e7e7e7;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            position: relative;
+        }
+        
+        .flexibility-card.active {
+            border-color: #003580;
+            background: #f0f6ff;
+        }
+        
+        .flexibility-card .icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .flexibility-card .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .flexibility-card .subtitle {
+            font-size: 12px;
+            color: #6b6b6b;
+            line-height: 1.3;
+        }
+        
+        .savings-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #00a650;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        
+        .price-trend-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e7e7e7;
+        }
+        
+        .price-trend-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .price-chart {
+            height: 60px;
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-bars {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            height: 100%;
+            gap: 1px;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            min-height: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .chart-bar.low {
+            background: linear-gradient(to top, #00a650, #a3e635);
+        }
+        
+        .chart-bar.medium {
+            background: linear-gradient(to top, #ffa500, #ffeb3b);
+        }
+        
+        .chart-bar.high {
+            background: linear-gradient(to top, #ff6b6b, #ff9800);
+        }
+        
+        .chart-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .price-legend {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #6b6b6b;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .legend-low { background: #00a650; }
+        .legend-medium { background: #ffa500; }
+        .legend-high { background: #ff6b6b; }
+        
+        .calendar-container {
+            padding: 0;
+        }
+        
+        .calendar-header {
+            padding: 20px 20px 16px;
+            background: white;
+            border-bottom: 1px solid #e7e7e7;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .month-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .month-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .nav-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            background: white;
+            border: 1px solid #e7e7e7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+        
+        .calendar {
+            padding: 0 20px 20px;
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-bottom: 8px;
+        }
+        
+        .weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b6b6b;
+            padding: 8px 4px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            position: relative;
+            min-height: 52px;
+            font-size: 13px;
+            background: white;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+        
+        .calendar-day.interactive {
+            cursor: pointer;
+        }
+        
+        .calendar-day.interactive:hover {
+            border-color: #003580;
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,53,128,0.2);
+        }
+        
+        .calendar-day.other-month {
+            color: #cccccc;
+            background: #f8f9fa;
+        }
+        
+        .calendar-day.selected {
+            background: #003580;
+            color: white;
+            border-color: #003580;
+        }
+        
+        .calendar-day.in-range {
+            background: #e6f3ff;
+            color: #003580;
+            border-color: #b3d9ff;
+        }
+        
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 2px;
+            font-size: 14px;
+        }
+        
+        .day-price {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 4px;
+            border-radius: 4px;
+            min-width: 28px;
+            text-align: center;
+        }
+        
+        .day-price.low {
+            background: #e8f5e8;
+            color: #00a650;
+        }
+        
+        .day-price.medium {
+            background: #fff3e0;
+            color: #ff8f00;
+        }
+        
+        .day-price.high {
+            background: #ffebee;
+            color: #f44336;
+        }
+        
+        .calendar-day.selected .day-price {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .recommendations {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e7e7e7;
+            display: none;
+        }
+        
+        .recommendations.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .recommendations-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .recommendation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e7e7e7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .recommendation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00a650, #66bb6a);
+        }
+        
+        .recommendation-card:hover {
+            border-color: #003580;
+            box-shadow: 0 4px 12px rgba(0,53,128,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .recommendation-dates {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .recommendation-savings {
+            background: #00a650;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        
+        .recommendation-details {
+            font-size: 12px;
+            color: #6b6b6b;
+            margin-bottom: 8px;
+        }
+        
+        .recommendation-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #003580;
+        }
+        
+        .cta-container {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #e7e7e7;
+            flex-shrink: 0;
+        }
+        
+        .selected-dates {
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: #f0f6ff;
+            border-radius: 8px;
+            border-left: 4px solid #003580;
+            display: none;
+        }
+        
+        .selected-dates.show {
+            display: block;
+        }
+        
+        .selected-dates-text {
+            font-size: 14px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .selected-dates-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #003580;
+        }
+        
+        .cta-button {
+            width: 100%;
+            background: #003580;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .cta-button:hover:not(:disabled) {
+            background: #002c6b;
+        }
+        
+        .cta-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .floating-tips {
+            position: fixed;
+            bottom: 120px;
+            right: 20px;
+            background: #003580;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            max-width: 200px;
+            box-shadow: 0 4px 16px rgba(0,53,128,0.3);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .floating-tips.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="status-bar">
+            <span>9:41 AM</span>
+            <span>Dec 15, 2024</span>
+        </div>
+        
+        <div class="header">
+            <div class="header-top">
+                <svg class="back-btn" fill="white" viewBox="0 0 24 24">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                </svg>
+                <div class="header-title">When do you want to go?</div>
+            </div>
+            
+            <div class="destination-info">
+                <div class="destination-name">Amsterdam, Netherlands</div>
+                <div class="trip-details">2 adults · 1 room · 3 nights</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section-header">
+                <div class="section-title">Find your perfect dates</div>
+                <div class="section-subtitle">See prices and availability across different dates to get the best deal</div>
+            </div>
+            
+            <div class="flexibility-options">
+                <div class="flexibility-grid">
+                    <div class="flexibility-card active" data-mode="exact">
+                        <svg class="icon" fill="#003580" viewBox="0 0 24 24">
+                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                        </svg>
+                        <div class="title">Exact dates</div>
+                        <div class="subtitle">I know when I want to travel</div>
+                    </div>
+                    
+                    <div class="flexibility-card" data-mode="flexible">
+                        <svg class="icon" fill="#6b6b6b" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <div class="title">I'm flexible</div>
+                        <div class="subtitle">Show me the best deals</div>
+                        <div class="savings-badge">Save up to 25%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="price-trend-section">
+                <div class="price-trend-title">
+                    <svg width="20" height="20" fill="#003580" viewBox="0 0 24 24">
+                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                    </svg>
+                    Price trends for March
+                </div>
+                <div class="price-chart">
+                    <div class="chart-bars" id="priceChart"></div>
+                </div>
+                <div class="price-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot legend-low"></div>
+                        <span>€75-85</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot legend-medium"></div>
+                        <span>€85-95</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot legend-high"></div>
+                        <span>€95+</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="month-navigation">
+                        <button class="nav-btn" id="prevMonth">
+                            <svg width="16" height="16" fill="#6b6b6b" viewBox="0 0 24 24">
+                                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                            </svg>
+                        </button>
+                        <div class="month-title" id="currentMonth">March 2025</div>
+                        <button class="nav-btn" id="nextMonth">
+                            <svg width="16" height="16" fill="#6b6b6b" viewBox="0 0 24 24">
+                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="calendar">
+                    <div class="weekdays">
+                        <div class="weekday">Sun</div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                </div>
+            </div>
+            
+            <div class="recommendations" id="recommendations">
+                <div class="recommendations-header">
+                    <svg width="20" height="20" fill="#ffa500" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    Smart recommendations
+                </div>
+                
+                <div class="recommendation-card pulse" data-dates="2025-03-15,2025-03-18">
+                    <div class="recommendation-header">
+                        <div class="recommendation-dates">Mar 15-18</div>
+                        <div class="recommendation-savings">Save €45</div>
+                    </div>
+                    <div class="recommendation-details">4 days, 3 nights • Weekday stay</div>
+                    <div class="recommendation-price">€234 total</div>
+                </div>
+                
+                <div class="recommendation-card" data-dates="2025-03-20,2025-03-23">
+                    <div class="recommendation-header">
+                        <div class="recommendation-dates">Mar 20-23</div>
+                        <div class="recommendation-savings">Save €32</div>
+                    </div>
+                    <div class="recommendation-details">4 days, 3 nights • Mixed week/weekend</div>
+                    <div class="recommendation-price">€247 total</div>
+                </div>
+                
+                <div class="recommendation-card" data-dates="2025-03-10,2025-03-13">
+                    <div class="recommendation-header">
+                        <div class="recommendation-dates">Mar 10-13</div>
+                        <div class="recommendation-savings">Save €38</div>
+                    </div>
+                    <div class="recommendation-details">4 days, 3 nights • Best value weekdays</div>
+                    <div class="recommendation-price">€241 total</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cta-container">
+            <div class="selected-dates" id="selectedDates">
+                <div class="selected-dates-text" id="selectedDatesText"></div>
+                <div class="selected-dates-price" id="selectedDatesPrice"></div>
+            </div>
+            
+            <button class="cta-button" id="ctaButton" disabled>
+                Select dates to continue
+            </button>
+        </div>
+    </div>
+    
+    <div class="floating-tips" id="floatingTip">
+        💡 Tip: Traveling mid-week can save you up to 25%!
+    </div>
+    
+    <script>
+        // Simple, clean state management
+        const state = {
+            currentDate: new Date(2025, 2, 1), // March 2025
+            selectedStartDate: null,
+            selectedEndDate: null,
+            isSelecting: false,
+            flexibilityMode: 'exact'
+        };
+        
+        // Price data for March 2025
+        const prices = {
+            '2025-03-01': { price: 89, level: 'medium' },
+            '2025-03-02': { price: 76, level: 'low' },
+            '2025-03-03': { price: 82, level: 'low' },
+            '2025-03-04': { price: 78, level: 'low' },
+            '2025-03-05': { price: 85, level: 'medium' },
+            '2025-03-06': { price: 93, level: 'medium' },
+            '2025-03-07': { price: 98, level: 'high' },
+            '2025-03-08': { price: 101, level: 'high' },
+            '2025-03-09': { price: 89, level: 'medium' },
+            '2025-03-10': { price: 76, level: 'low' },
+            '2025-03-11': { price: 73, level: 'low' },
+            '2025-03-12': { price: 78, level: 'low' },
+            '2025-03-13': { price: 85, level: 'medium' },
+            '2025-03-14': { price: 92, level: 'medium' },
+            '2025-03-15': { price: 78, level: 'low' },
+            '2025-03-16': { price: 74, level: 'low' },
+            '2025-03-17': { price: 76, level: 'low' },
+            '2025-03-18': { price: 82, level: 'low' },
+            '2025-03-19': { price: 89, level: 'medium' },
+            '2025-03-20': { price: 85, level: 'medium' },
+            '2025-03-21': { price: 95, level: 'high' },
+            '2025-03-22': { price: 103, level: 'high' },
+            '2025-03-23': { price: 87, level: 'medium' },
+            '2025-03-24': { price: 79, level: 'low' },
+            '2025-03-25': { price: 76, level: 'low' },
+            '2025-03-26': { price: 81, level: 'low' },
+            '2025-03-27': { price: 88, level: 'medium' },
+            '2025-03-28': { price: 94, level: 'medium' },
+            '2025-03-29': { price: 99, level: 'high' },
+            '2025-03-30': { price: 105, level: 'high' },
+            '2025-03-31': { price: 91, level: 'medium' }
+        };
+        
+        // Utility functions
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+        
+        function isSameDay(date1, date2) {
+            return formatDate(date1) === formatDate(date2);
+        }
+        
+        function isDateInRange(date, start, end) {
+            return date > start && date < end;
+        }
+        
+        // Calendar generation
+        function generateCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            const year = state.currentDate.getFullYear();
+            const month = state.currentDate.getMonth();
+            
+            // Update month title
+            document.getElementById('currentMonth').textContent = 
+                state.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            // Get first day of month and calculate start date
+            const firstDay = new Date(year, month, 1);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            // Generate 42 days (6 weeks)
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = createDayElement(date, month);
+                grid.appendChild(dayElement);
+            }
+            
+            generatePriceChart();
+        }
+        
+        function createDayElement(date, currentMonth) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day';
+            
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = date.getDate();
+            dayDiv.appendChild(dayNumber);
+            
+            const isCurrentMonth = date.getMonth() === currentMonth;
+            const dateKey = formatDate(date);
+            const priceInfo = prices[dateKey];
+            
+            if (!isCurrentMonth) {
+                dayDiv.classList.add('other-month');
+            } else {
+                // ALL March 2025 dates are interactive since we're in Dec 2024
+                dayDiv.classList.add('interactive');
+                
+                if (priceInfo) {
+                    const priceDiv = document.createElement('div');
+                    priceDiv.className = `day-price ${priceInfo.level}`;
+                    priceDiv.textContent = `€${priceInfo.price}`;
+                    dayDiv.appendChild(priceDiv);
+                    
+                    dayDiv.title = `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - €${priceInfo.price}`;
+                }
+                
+                // Add click handler
+                dayDiv.addEventListener('click', () => handleDateClick(date));
+            }
+            
+            // Apply selection styling
+            if (state.selectedStartDate && isSameDay(date, state.selectedStartDate)) {
+                dayDiv.classList.add('selected');
+            }
+            if (state.selectedEndDate && isSameDay(date, state.selectedEndDate)) {
+                dayDiv.classList.add('selected');
+            }
+            if (state.selectedStartDate && state.selectedEndDate && 
+                isDateInRange(date, state.selectedStartDate, state.selectedEndDate)) {
+                dayDiv.classList.add('in-range');
+            }
+            
+            return dayDiv;
+        }
+        
+        function generatePriceChart() {
+            const chartContainer = document.getElementById('priceChart');
+            chartContainer.innerHTML = '';
+            
+            const year = state.currentDate.getFullYear();
+            const month = state.currentDate.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateKey = formatDate(date);
+                const priceInfo = prices[dateKey];
+                
+                if (priceInfo) {
+                    const bar = document.createElement('div');
+                    bar.className = `chart-bar ${priceInfo.level}`;
+                    
+                    // Calculate height (60px max)
+                    const minPrice = 70;
+                    const maxPrice = 110;
+                    const heightPercent = ((priceInfo.price - minPrice) / (maxPrice - minPrice)) * 100;
+                    bar.style.height = `${Math.max(heightPercent, 15)}%`;
+                    
+                    bar.title = `${day}: €${priceInfo.price}`;
+                    chartContainer.appendChild(bar);
+                }
+            }
+        }
+        
+        // Event handlers
+        function handleDateClick(date) {
+            console.log('Date clicked:', formatDate(date));
+            
+            if (!state.selectedStartDate) {
+                // First selection
+                state.selectedStartDate = new Date(date);
+                state.isSelecting = true;
+                console.log('Start date selected:', formatDate(state.selectedStartDate));
+            } else if (state.isSelecting) {
+                // Second selection - complete range
+                if (date > state.selectedStartDate) {
+                    state.selectedEndDate = new Date(date);
+                } else {
+                    state.selectedEndDate = state.selectedStartDate;
+                    state.selectedStartDate = new Date(date);
+                }
+                state.isSelecting = false;
+                console.log('End date selected:', formatDate(state.selectedEndDate));
+                updateSelectedDates();
+            } else {
+                // Start new selection
+                state.selectedStartDate = new Date(date);
+                state.selectedEndDate = null;
+                state.isSelecting = true;
+                console.log('New start date:', formatDate(state.selectedStartDate));
+                updateSelectedDates();
+            }
+            
+            generateCalendar();
+        }
+        
+        function updateSelectedDates() {
+            const selectedDatesDiv = document.getElementById('selectedDates');
+            const ctaButton = document.getElementById('ctaButton');
+            
+            if (state.selectedStartDate && state.selectedEndDate) {
+                const startStr = state.selectedStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const endStr = state.selectedEndDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const nights = Math.ceil((state.selectedEndDate - state.selectedStartDate) / (1000 * 60 * 60 * 24));
+                
+                // Calculate total price
+                let totalPrice = 0;
+                const currentDate = new Date(state.selectedStartDate);
+                while (currentDate < state.selectedEndDate) {
+                    const dateKey = formatDate(currentDate);
+                    const priceInfo = prices[dateKey];
+                    if (priceInfo) {
+                        totalPrice += priceInfo.price;
+                    }
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                
+                document.getElementById('selectedDatesText').textContent = `${startStr} - ${endStr} • ${nights} nights`;
+                document.getElementById('selectedDatesPrice').textContent = `€${totalPrice} total`;
+                selectedDatesDiv.classList.add('show');
+                
+                ctaButton.disabled = false;
+                ctaButton.textContent = 'Search hotels';
+            } else {
+                selectedDatesDiv.classList.remove('show');
+                ctaButton.disabled = true;
+                ctaButton.textContent = 'Select dates to continue';
+            }
+        }
+        
+        function setFlexibilityMode(mode) {
+            state.flexibilityMode = mode;
+            
+            // Update UI
+            document.querySelectorAll('.flexibility-card').forEach(card => {
+                card.classList.remove('active');
+                const icon = card.querySelector('.icon');
+                if (card.dataset.mode === mode) {
+                    card.classList.add('active');
+                    icon.setAttribute('fill', '#003580');
+                } else {
+                    icon.setAttribute('fill', '#6b6b6b');
+                }
+            });
+            
+            // Show/hide recommendations
+            const recommendations = document.getElementById('recommendations');
+            if (mode === 'flexible') {
+                recommendations.classList.add('show');
+                showFloatingTip();
+            } else {
+                recommendations.classList.remove('show');
+            }
+        }
+        
+        function showFloatingTip() {
+            const tip = document.getElementById('floatingTip');
+            tip.classList.add('show');
+            setTimeout(() => {
+                tip.classList.remove('show');
+            }, 4000);
+        }
+        
+        function selectRecommendation(startDate, endDate) {
+            state.selectedStartDate = new Date(startDate);
+            state.selectedEndDate = new Date(endDate);
+            state.isSelecting = false;
+            
+            updateSelectedDates();
+            generateCalendar();
+            
+            // Scroll to calendar
+            document.querySelector('.calendar-container').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start' 
+            });
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing calendar...');
+            
+            // Generate initial calendar
+            generateCalendar();
+            
+            // Flexibility card clicks
+            document.querySelectorAll('.flexibility-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    setFlexibilityMode(card.dataset.mode);
+                });
+            });
+            
+            // Month navigation
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                state.currentDate.setMonth(state.currentDate.getMonth() - 1);
+                generateCalendar();
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                state.currentDate.setMonth(state.currentDate.getMonth() + 1);
+                generateCalendar();
+            });
+            
+            // Recommendation clicks
+            document.querySelectorAll('.recommendation-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const [startDate, endDate] = card.dataset.dates.split(',');
+                    selectRecommendation(startDate, endDate);
+                });
+            });
+            
+            // CTA button
+            document.getElementById('ctaButton').addEventListener('click', () => {
+                if (state.selectedStartDate && state.selectedEndDate) {
+                    alert('Great! Proceeding to search results with your selected dates.');
+                }
+            });
+            
+            // Auto-switch to flexible mode for demo
+            setTimeout(() => {
+                setFlexibilityMode('flexible');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
